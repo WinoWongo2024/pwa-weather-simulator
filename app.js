@@ -1,82 +1,93 @@
 // --- 1. CONFIGURATION AND UTILITIES ---
 
-// Define the simulated base weather for the day
-const SIMULATED_DAILY_CONFIG = {
-    location: 'Sim City, UK',
-    today: {
-        maxTemp: 7,
-        minTemp: -2, // Nighttime low
-        conditions: [
-            { startHour: 6, endHour: 10, condition: 'Rain', icon: '🌧️', tempShift: 1 }, // Morning Rain
-            { startHour: 10, endHour: 16, condition: 'Partly Cloudy', icon: '🌤️', tempShift: 4 }, // Clearing to afternoon high
-            { startHour: 16, endHour: 20, condition: 'Sleet', icon: '🌨️', tempShift: 0 }, // Evening Sleet/Freezing
-            { startHour: 20, endHour: 24, condition: 'Clear Night', icon: '✨', tempShift: -3 } // Night Low
-        ]
-    }
-    // Note: Daily forecast logic will reuse these values and cycle the day names.
-};
-
-const CONDITION_ICONS = {
-    'Sunny': '☀️',
-    'Partly Cloudy': '🌤️',
-    'Mostly Cloudy': '☁️',
+// Map conditions to better symbols (using unicode weather pictograms or similar)
+const WEATHER_SYMBOLS = {
+    'Sunny': '🔆',
+    'Partly Cloudy': '⛅',
+    'Mostly Cloudy': '🌥️',
     'Cloudy': '☁️',
     'Rain': '🌧️',
+    'Heavy Rain': '⛈️',
     'Sleet': '🌨️',
     'Clear Night': '✨',
-    'Snow': '❄️'
+    'Light Snow': '❄️',
+    'Fog': '🌫️',
+    'Thunderstorms': '🌩️'
 };
 
+// Define the simulated base weather for the current day
+// Time is 10:50 AM in Scarborough, UK (GMT)
+const SIMULATED_TODAY_CONFIG = {
+    location: 'Scarborough, UK',
+    maxTemp: 7, // High of 7°C
+    minTemp: -2, // Low of -2°C
+    // Define key weather changes throughout the 24 hours for realism
+    conditions: [
+        // Night/Early Morning (00:00 - 06:00)
+        { startHour: 0, endHour: 6, condition: 'Clear Night', tempShift: -2 }, 
+        // Morning Rain (06:00 - 11:00)
+        { startHour: 6, endHour: 11, condition: 'Rain', tempShift: 1 }, 
+        // Clearing (11:00 - 15:00) - Reaching High Temp
+        { startHour: 11, endHour: 15, condition: 'Partly Cloudy', tempShift: 3 }, 
+        // Cooling Down (15:00 - 18:00)
+        { startHour: 15, endHour: 18, condition: 'Mostly Cloudy', tempShift: 0 }, 
+        // Sleet/Freezing (18:00 - 24:00)
+        { startHour: 18, endHour: 24, condition: 'Sleet', tempShift: -1 } 
+    ]
+};
+
+// --- 2. DATA GENERATION FUNCTIONS ---
+
 /**
- * Gets the simulated condition and temperature based on the hour.
+ * Calculates a smooth temperature based on the hour (0-23) using a sine-like curve.
+ * Peak temp around 14:00 (2 PM), low temp around 03:00 (3 AM).
+ * @param {number} hour - The hour (0-23).
+ * @param {number} maxTemp - The daily high temperature.
+ * @param {number} minTemp - The daily low temperature.
+ * @returns {number} The calculated temperature.
+ */
+function calculateTemp(hour, maxTemp, minTemp) {
+    // Shift the hour so the low point is at hour 3 and the high point is at hour 14
+    const offsetHour = (hour - 3 + 24) % 24; 
+    const amplitude = (maxTemp - minTemp) / 2;
+    const midpoint = (maxTemp + minTemp) / 2;
+    // Use a sine wave to simulate the temperature curve
+    const temp = midpoint + amplitude * Math.sin((offsetHour - 5.5) * (2 * Math.PI / 24));
+    return Math.round(temp);
+}
+
+/**
+ * Gets the simulated condition and temperature for a specific hour.
  * @param {number} hour - The hour (0-23).
  * @returns {{temp: number, condition: string, icon: string}}
  */
 function getWeatherForHour(hour) {
-    const { maxTemp, minTemp, conditions } = SIMULATED_DAILY_CONFIG.today;
+    const { maxTemp, minTemp, conditions } = SIMULATED_TODAY_CONFIG;
     
     // Find the current condition block
     const currentConditionBlock = conditions.find(c => hour >= c.startHour && hour < c.endHour) || conditions[0];
     
-    // Simple temperature interpolation: 
-    // Peak temp at 14:00 (2 PM), low temp at 03:00 (3 AM).
-    let temp;
-    if (hour >= 6 && hour <= 14) {
-        // Morning/Day ramp-up (6 AM to 2 PM)
-        const range = 14 - 6;
-        const progress = (hour - 6) / range;
-        temp = Math.round(minTemp + (maxTemp - minTemp) * progress);
-    } else if (hour > 14 && hour <= 23) {
-        // Afternoon/Evening cool-down (2 PM onwards)
-        const range = 23 - 14;
-        const progress = (23 - hour) / range;
-        // Cools down from maxTemp towards minTemp
-        temp = Math.round(minTemp + (maxTemp - minTemp) * progress * 0.7); 
-    } else {
-        // Night (0 to 5 AM) - keep it near the min temp
-        temp = minTemp;
-    }
+    // Calculate base temperature smoothly
+    let temp = calculateTemp(hour, maxTemp, minTemp);
 
-    // Apply specific shift for the condition block
+    // Apply specific shift for the condition block (e.g., rain suppresses temp)
     temp += currentConditionBlock.tempShift;
 
     return {
         temp: temp,
         condition: currentConditionBlock.condition,
-        icon: currentConditionBlock.icon
+        icon: WEATHER_SYMBOLS[currentConditionBlock.condition]
     };
 }
 
-
-// --- 2. DATA GENERATION FUNCTIONS ---
 
 function generateHourlyForecast() {
     const forecast = [];
     const now = new Date();
     let currentHour = now.getHours();
     
-    // Generate the next 8 hours
-    for (let i = 0; i < 8; i++) {
+    // Generate the next 10 hours for a better view
+    for (let i = 0; i < 10; i++) {
         const hourToProcess = (currentHour + i) % 24;
         const data = getWeatherForHour(hourToProcess);
         
@@ -97,24 +108,48 @@ function generateDailyForecast() {
     const forecast = [];
     const todayIndex = new Date().getDay();
 
-    // Generate forecast for the next 7 days, cycling temperatures
+    // --- Low Front Simulation Logic ---
+    // Start with Today's base temps
+    let maxBase = SIMULATED_TODAY_CONFIG.maxTemp;
+    let minBase = SIMULATED_TODAY_CONFIG.minTemp;
+
     for (let i = 0; i < 7; i++) {
         const dayIndex = (todayIndex + i) % 7;
         
-        // Simple cycle for variety in the 7-day forecast
-        const tempShift = i % 3 === 0 ? 0 : (i % 3 === 1 ? 2 : -1); 
-        const conditionList = ['Rain', 'Partly Cloudy', 'Sunny', 'Sleet', 'Cloudy'];
-        const condition = conditionList[(i * 2) % conditionList.length];
+        let condition, max, min;
 
-        const max = SIMULATED_DAILY_CONFIG.today.maxTemp + tempShift;
-        const min = SIMULATED_DAILY_CONFIG.today.minTemp + tempShift - 1;
+        if (i === 0) {
+            // Today's forecast uses the exact configuration
+            max = maxBase;
+            min = minBase;
+            condition = getWeatherForHour(new Date().getHours()).condition;
+        } else if (i >= 1 && i <= 3) {
+            // Days 1-3: Low front moves in - gets cooler and wetter
+            max = maxBase - (i * 2); 
+            min = minBase - (i * 1);
+            condition = i === 1 ? 'Rain' : 'Heavy Rain';
+        } else if (i === 4) {
+            // Day 4: Peak Cold/Wet - possible snow/sleet at low temps
+            max = maxBase - 6; 
+            min = minBase - 4;
+            condition = min < 0 ? 'Sleet' : 'Rain';
+        } else {
+            // Days 5-6: Front passes, temperatures slowly return
+            max = maxBase - 3 + (i - 5);
+            min = minBase - 1 + (i - 5);
+            condition = 'Partly Cloudy';
+        }
+
+        // Ensure temp is not below a reasonable minimum
+        max = Math.max(max, -5); 
+        min = Math.max(min, -10);
 
         forecast.push({
             day: i === 0 ? 'Today' : days[dayIndex],
-            max: max,
-            min: min,
+            max: Math.round(max),
+            min: Math.round(min),
             condition: condition,
-            icon: CONDITION_ICONS[condition]
+            icon: WEATHER_SYMBOLS[condition]
         });
     }
     return forecast;
@@ -123,26 +158,26 @@ function generateDailyForecast() {
 
 // --- 3. RENDERING FUNCTIONS ---
 
+/**
+ * Updates the current time every second without causing reflow disruption.
+ */
 function updateCurrentTime() {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    // Use an efficient time formatting for the high-frequency update
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     const dateString = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
     
     document.getElementById('current-time').textContent = `${dateString} | ${timeString}`;
 }
 
-function renderCurrentWeather(data) {
+function renderCurrentWeather() {
     // Determine current hour's specific weather using the generator
     const now = new Date();
     const currentHourData = getWeatherForHour(now.getHours());
 
-    document.getElementById('current-location').textContent = SIMULATED_DAILY_CONFIG.location;
+    document.getElementById('current-location').textContent = SIMULATED_TODAY_CONFIG.location;
     document.getElementById('current-temp').textContent = `${currentHourData.temp}°C`;
-    document.getElementById('current-condition').textContent = `${currentHourData.icon} ${currentHourData.condition}`;
-    
-    // Start updating the time every minute
-    updateCurrentTime();
-    setInterval(updateCurrentTime, 60000); 
+    document.getElementById('current-condition').innerHTML = `<span class="icon">${currentHourData.icon}</span> ${currentHourData.condition}`;
 }
 
 function renderHourlyForecast(hourly) {
@@ -180,9 +215,7 @@ function renderDailyForecast(daily) {
 }
 
 
-// --- 4. SERVICE WORKER REGISTRATION (Kept from previous step) ---
-// (You do not need to change sw.js or the registration function)
-
+// --- 4. SERVICE WORKER REGISTRATION (Same as before) ---
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -192,22 +225,24 @@ function registerServiceWorker() {
                 console.error('ServiceWorker registration failed: ', err);
             });
         });
-    } else {
-        console.warn('Service Workers are not supported in this browser.');
     }
 }
 
 // --- 5. INITIALIZATION ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Generate and render dynamic data
+    // 1. Render all weather data
     const hourlyData = generateHourlyForecast();
     const dailyData = generateDailyForecast();
     
-    renderCurrentWeather(); // Will now call the generator based on current hour
+    renderCurrentWeather();
     renderHourlyForecast(hourlyData);
     renderDailyForecast(dailyData);
     
-    // 2. Register the PWA Service Worker
+    // 2. High-frequency Time Update (every 1000ms)
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000); 
+
+    // 3. Register the PWA Service Worker
     registerServiceWorker();
 });
