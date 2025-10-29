@@ -1,18 +1,18 @@
 /* General Styling */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1f2a40, #0d1526); /* Dark Blue Gradient */
+    color: #f0f4f8; /* Light text */
     margin: 0;
     padding: 0;
+    min-height: 100vh;
 }
 
 header {
-    background-color: #3498db; /* Blue theme color */
-    color: white;
-    padding: 20px;
+    padding: 25px 20px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent header */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .container {
@@ -21,64 +21,140 @@ header {
     margin: 0 auto;
 }
 
-/* Card Styling */
+/* Glassmorphism Weather Card Styling */
 .weather-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.1); /* Translucent White */
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px); /* The "Glass" Effect */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 25px;
+    padding: 25px;
 }
 
 h2 {
-    color: #3498db;
-    border-bottom: 1px solid #ecf0f1;
+    color: #8be9fd; /* Light Cyan for headings */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding-bottom: 10px;
     margin-top: 0;
+    font-weight: 400;
+    font-size: 1.5em;
 }
 
 /* Current Weather Styles */
 #current-temp {
-    font-size: 3.5em;
-    font-weight: bold;
-    margin: 10px 0;
+    font-size: 5em;
+    font-weight: 300;
+    margin: 15px 0 5px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    line-height: 1;
+}
+
+#current-location {
+    font-size: 1.8em;
+    font-weight: 500;
+    margin-bottom: 5px;
 }
 
 #current-condition {
-    font-size: 1.2em;
+    font-size: 1.4em;
     font-style: italic;
-    color: #555;
+    color: #bd93f9; /* Light Purple */
+}
+
+#current-time {
+    font-size: 1em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 5px;
 }
 
 /* Forecast List Styles */
 .forecast-list {
     display: flex;
-    /* Use gap for spacing between items */
-    gap: 10px; 
+    gap: 12px;
     padding-bottom: 10px;
-}
-
-.scrollable {
-    overflow-x: auto; /* Enable horizontal scrolling for hourly forecast on smaller screens */
+    overflow-x: auto; /* Enable horizontal scrolling */
     white-space: nowrap; /* Prevent items from wrapping */
+    margin: 10px 0;
 }
 
 .forecast-item {
-    min-width: 100px; /* Ensures hourly items are a good size */
-    flex-shrink: 0; /* Prevents hourly items from shrinking */
+    min-width: 120px;
+    flex-shrink: 0; 
     text-align: center;
-    padding: 10px 5px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background-color: #fafafa;
+    padding: 15px 5px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3); /* Darker translucent background for items */
+    transition: transform 0.2s;
+}
+
+.forecast-item:hover {
+    transform: translateY(-5px);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .forecast-item .time, .forecast-item .day {
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 5px;
+    color: #ff79c6; /* Pink for time/day */
+}
+
+.forecast-item .icon {
+    font-size: 2em;
+    display: block;
+    margin: 5px 0;
 }
 
 .forecast-item .temp {
-    font-size: 1.1em;
-    color: #e74c3c; /* Red for emphasis on temperature */
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #50fa7b; /* Green for temp */
+}
+
+.forecast-item .condition {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: normal;
+    padding: 0 5px;
+}
+
+/* 7-Day Specific adjustments */
+#daily-list {
+    flex-direction: column;
+}
+#daily-list .forecast-item {
+    min-width: unset;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    padding: 10px 20px;
+}
+#daily-list .day {
+    flex: 1;
+}
+#daily-list .icon {
+    flex: 0;
+    margin-right: 10px;
+}
+#daily-list .condition {
+    flex: 1;
+    text-align: right;
+    color: #bd93f9;
+}
+#daily-list .temp {
+    flex: 0;
+    margin-left: 15px;
+    color: #ffb86c; /* Orange for min/max temp contrast */
+}
+
+/* Responsive adjustment for daily list on small screens */
+@media (max-width: 600px) {
+    #daily-list .forecast-item {
+        padding: 10px;
+    }
+    #daily-list .temp {
+        font-size: 1.1em;
+    }
 }
