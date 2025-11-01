@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Weather Simulation</title>
+    
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    
     <script defer src="script.js"></script>
+
     <script>
         // PWA service worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Registering with the scope / to cover the whole app
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => console.log('SW registered: ', registration))
                     .catch(registrationError => console.log('SW registration failed: ', registrationError));
@@ -32,6 +36,22 @@
         <div class="weather-display">
             <h2 id="current-temp">--°C</h2>
             <p id="current-condition">Loading...</p>
+            
+            <div class="extended-info">
+                <div>
+                    <span class="info-label">Humidity:</span>
+                    <span id="current-humidity">--%</span>
+                </div>
+                <div>
+                    <span class="info-label">Wind:</span>
+                    <span id="current-wind">-- km/h --</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Temperature Trend</h3>
+            <canvas id="temp-chart"></canvas>
         </div>
 
         <div class="controls">
@@ -39,7 +59,7 @@
         </div>
 
         <div class="forecast-data">
-            <h3>24-Hour Forecast</h3>
+            <h3>Hourly Forecast (Next Hours)</h3>
             <div id="hourly-forecast-container" class="hourly-forecast-grid">
                 </div>
         </div>
