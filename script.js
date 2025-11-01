@@ -400,16 +400,22 @@ function clearCacheAndReload() {
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Load forecast or generate a new one
     const storedForecast = localStorage.getItem(FORECAST_STORAGE_KEY);
+    
+    // Check for the NEW key (V3). If it doesn't exist, generate a new forecast.
     if (storedForecast) {
         dailyForecast = JSON.parse(storedForecast);
+        console.log('Loaded forecast from storage.');
         
         // Re-generate 5-day view and warnings on load to reflect current dates
         const frontType = Math.random() < COLD_FRONT_CHANCE ? 'Cold Front' : 'Warm Front';
         generateFiveDayForecast(frontType);
     } else {
-        generateDailyForecast();
+        console.warn(`No forecast found under key: ${FORECAST_STORAGE_KEY}. Generating new forecast.`);
+        // **CRITICAL FIX:** Ensure generateDailyForecast is called if no stored data exists.
+        generateDailyForecast(); 
     }
     
+    // Initialize the chart and start the simulation
     renderGraphs();
     
     setInterval(runSimulation, UPDATE_INTERVAL_MS);
