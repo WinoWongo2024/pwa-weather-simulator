@@ -24,6 +24,8 @@
     </script>
 </head>
 <body>
+    <div id="weather-animation-layer" class="animation-layer"></div>
+    
     <div class="weather-app">
         <button id="refresh-cache-btn" class="utility-btn">🔄 Clear Cache & Reload</button>
 
@@ -56,6 +58,18 @@
 
         <div class="controls">
             <button id="generate-forecast-btn">Generate New Daily Forecast (at 23:59:59)</button>
+        </div>
+
+        <div class="forecast-section">
+            <h3>5-Day Outlook</h3>
+            <div id="five-day-forecast-container" class="five-day-grid">
+                </div>
+            
+            <div class="warnings-container">
+                <h3>Weather Alerts ⚠️</h3>
+                <ul id="active-warnings-list">
+                    </ul>
+            </div>
         </div>
 
         <div class="forecast-data">
