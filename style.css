@@ -7,7 +7,7 @@
     --shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Body background transition for the visual enhancement */
+/* Body and Animation Layer Setup */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-color);
@@ -17,14 +17,96 @@ body {
     min-height: 100vh;
     padding: 20px;
     margin: 0;
-    
-    /* Dynamic Background and Transition */
     background-image: linear-gradient(to top, #f0f4f8, #cce0ff);
     transition: background-image 1.5s ease-in-out; 
 }
 
+/* --- Weather Animation Layer --- */
+.animation-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; 
+    pointer-events: none; 
+    z-index: 10; 
+}
+
+/* --- Rain Animation --- */
+.rain-drop {
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: rgba(74, 144, 226, 0.7); 
+    transform: translateY(-100vh); 
+    animation: rain-fall linear infinite;
+}
+
+@keyframes rain-fall {
+    to {
+        transform: translateY(200vh);
+    }
+}
+
+/* --- Snow Animation --- */
+.snow-flake {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: white;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+    animation: snow-fall linear infinite;
+}
+
+@keyframes snow-fall {
+    0% {
+        transform: translate(0, -10vh) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(0, 100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* --- Simple Cloud Animation --- */
+.cloud-group {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 200%; 
+    height: 100px;
+    animation: cloud-move 60s linear infinite;
+}
+
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    box-shadow: 
+        10px 10px 0 rgba(255, 255, 255, 0.6),
+        -10px 10px 0 rgba(255, 255, 255, 0.7);
+}
+
+.cloud1 {
+    width: 150px; height: 50px; top: 10px; left: 10%;
+}
+
+.cloud2 {
+    width: 100px; height: 35px; top: 30px; left: 40%;
+}
+
+@keyframes cloud-move {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+
+/* --- Main App Container --- */
 .weather-app {
-    background: rgba(255, 255, 255, 0.95); /* Slightly transparent white card */
+    background: rgba(255, 255, 255, 0.95); 
     padding: 30px;
     border-radius: 15px;
     box-shadow: var(--shadow);
@@ -32,6 +114,7 @@ body {
     max-width: 600px; 
     width: 90%;
     position: relative;
+    z-index: 20; /* Keep app above animation layer */
 }
 
 /* Utility button style */
@@ -54,117 +137,71 @@ body {
     color: var(--card-color);
 }
 
-h1 {
-    color: var(--primary-color);
-    margin-bottom: 5px;
-}
+h1 { color: var(--primary-color); margin-bottom: 5px; }
+.time-display { font-size: 1.1em; font-weight: 600; margin-bottom: 20px; color: var(--secondary-color); }
+.weather-display h2 { font-size: 4em; margin: 10px 0; color: var(--primary-color); }
+.weather-display p { font-size: 1.5em; margin-bottom: 30px; }
 
-.time-display {
-    font-size: 1.1em;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--secondary-color);
-}
-
-.weather-display h2 {
-    font-size: 4em;
-    margin: 10px 0;
-    color: var(--primary-color);
-}
-
-.weather-display p {
-    font-size: 1.5em;
-    margin-bottom: 30px;
-}
 
 /* Extended Info Panel Styling */
 .extended-info {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px 0;
-    margin-bottom: 25px;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 1em;
+    display: flex; justify-content: space-around; padding: 15px 0; margin-bottom: 25px;
+    border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; font-size: 1em;
 }
+.extended-info div { text-align: center; }
+.info-label { display: block; font-size: 0.9em; color: var(--secondary-color); margin-bottom: 3px; }
 
-.extended-info div {
-    text-align: center;
-}
-
-.info-label {
-    display: block;
-    font-size: 0.9em;
-    color: var(--secondary-color);
-    margin-bottom: 3px;
-}
 
 /* Chart Styling */
 .chart-container {
-    margin: 25px 0;
-    padding: 10px;
-    background: var(--card-color);
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin: 25px 0; padding: 10px; background: var(--card-color);
+    border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
+.chart-container h3 { margin-top: 0; color: var(--primary-color); font-size: 1.2em; }
 
-.chart-container h3 {
-    margin-top: 0;
-    color: var(--primary-color);
-    font-size: 1.2em;
+
+/* 5-Day Forecast Grid */
+.forecast-section { margin-top: 30px; text-align: left; }
+.five-day-grid {
+    display: flex; justify-content: space-around; padding: 15px 0;
+    background: var(--background-color); border-radius: 10px; margin-bottom: 30px;
 }
+.day-item { flex: 1; text-align: center; padding: 5px; border-right: 1px solid #e0e0e0; }
+.day-item:last-child { border-right: none; }
+.day-label { display: block; font-size: 0.9em; color: var(--secondary-color); margin-bottom: 5px; }
+.day-icon { display: block; font-size: 1.8em; margin-bottom: 5px; }
+.day-temp { font-size: 1.1em; font-weight: bold; }
+.max-temp { color: var(--primary-color); margin-right: 5px; }
+.min-temp { color: var(--secondary-color); font-weight: normal; }
 
-/* Controls and buttons */
+
+/* Weather Warnings */
+.warnings-container {
+    padding: 15px; border: 2px solid #ffc107; 
+    border-radius: 10px; background: #fffbe6; margin-bottom: 20px;
+}
+.warnings-container h3 { margin-top: 0; color: #dc3545; }
+#active-warnings-list { list-style: none; padding: 0; margin: 0; }
+#active-warnings-list li { padding: 5px 0; border-bottom: 1px dashed #ffc107; font-size: 0.95em; color: #dc3545; }
+#active-warnings-list li:last-child { border-bottom: none; }
+
+
+/* Hourly Forecast Grid */
+.forecast-data { margin-top: 30px; text-align: left; }
+.hourly-forecast-grid {
+    display: flex; overflow-x: auto; padding: 10px 0;
+    border-radius: 8px; background: #e9ecef; white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+.forecast-item { flex: 0 0 70px; padding: 10px 5px; text-align: center; border-right: 1px dashed #dcdcdc; }
+.forecast-item:last-child { border-right: none; }
+.forecast-item .icon { display: block; font-size: 2em; margin: 5px 0; }
+.forecast-item .time { font-weight: bold; color: var(--primary-color); }
+
+/* Controls button */
 .controls button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
+    background-color: var(--primary-color); color: white; border: none;
+    padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1em;
     transition: background-color 0.3s;
 }
-
-.controls button:hover {
-    background-color: #0056b3;
-}
-
-/* 24-Hour Forecast Grid Styling */
-.forecast-data {
-    margin-top: 30px;
-    text-align: left;
-}
-
-.hourly-forecast-grid {
-    display: flex;
-    overflow-x: auto; /* Allows horizontal scrolling for 24 items */
-    padding: 10px 0;
-    border-radius: 8px;
-    background: #e9ecef;
-    white-space: nowrap; /* Ensures all items stay on one line */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-
-.forecast-item {
-    flex: 0 0 70px; /* Fixed width for each item */
-    padding: 10px 5px;
-    text-align: center;
-    border-right: 1px dashed #dcdcdc; 
-    transition: background-color 0.2s;
-}
-
-.forecast-item:last-child {
-    border-right: none;
-}
-
-.forecast-item .icon {
-    display: block;
-    font-size: 2em;
-    margin: 5px 0;
-}
-
-.forecast-item .time {
-    font-weight: bold;
-    color: var(--primary-color);
-}
+.controls button:hover { background-color: #0056b3; }
