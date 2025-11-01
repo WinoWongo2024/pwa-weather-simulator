@@ -3,37 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulated Weather PWA</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1f2a40">
-    
+    <title>Advanced Weather Simulation</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script defer src="script.js"></script>
+    <script>
+        // PWA service worker registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => console.log('SW registered: ', registration))
+                    .catch(registrationError => console.log('SW registration failed: ', registrationError));
+            });
+        }
+    </script>
 </head>
 <body>
-    <header>
-        <h1>Simulated Weather App</h1>
-    </header>
+    <div class="weather-app">
+        <h1>Simulated Weather</h1>
+        <div class="time-display">
+            Current Simulated Time: <span id="current-time">00:00:00</span>
+        </div>
+        <div class="weather-display">
+            <h2 id="current-temp">--°C</h2>
+            <p id="current-condition">Loading...</p>
+        </div>
 
-    <main class="container">
-        <section id="current-weather" class="weather-card">
-            <div id="current-location">--</div> <div id="current-temp" class="temp">--°C</div>
-            <div id="current-condition" class="condition">--</div>
-            <div id="current-time">--</div> </section>
+        <div class="controls">
+            <button id="generate-forecast-btn">Generate New Daily Forecast (at 23:59:59)</button>
+        </div>
 
-        <section id="hourly-forecast" class="weather-card">
-            <h2>Hourly Forecast</h2>
-            <div id="hourly-list" class="forecast-list scrollable">
-                </div>
-        </section>
-
-        <section id="daily-forecast" class="weather-card">
-            <h2>Next 7 Days</h2>
-            <div id="daily-list" class="forecast-list">
-                </div>
-        </section>
-    </main>
-
-    <script src="app.js"></script>
+        <div class="forecast-data">
+            <h3>24-Hour Forecast</h3>
+            <pre id="forecast-output"></pre>
+        </div>
+    </div>
 </body>
 </html>
