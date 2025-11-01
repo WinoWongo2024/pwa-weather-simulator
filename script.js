@@ -108,6 +108,9 @@ function generateFiveDayForecast(frontType) {
     const todayData = dailyForecast;
 
     for (let i = 0; i < 5; i++) {
+        // FIX: Added a check for empty dailyForecast to prevent crash, though it shouldn't be empty if called correctly.
+        if (todayData.length === 0) continue; 
+        
         const temps = todayData.map(d => d.temperature + getRandomInt(-2, 2) * i); // Temperature gets more varied days out
         const dailyMax = Math.min(GLOBAL_MAX_TEMP, Math.max(...temps));
         const dailyMin = Math.max(GLOBAL_MIN_TEMP, Math.min(...temps));
@@ -148,7 +151,8 @@ function generateWeatherWarnings(frontType) {
     });
 
     // Check for severe precipitation in today's forecast
-    const hasSeverePrecip = dailyForecast.some(d => d.name.includes('Heavy') || d.name === 'Hail' || d.name === 'Thunderstorms');
+    // FIX: dailyForecast items have a 'condition' property (the name string), not a 'name' property.
+    const hasSeverePrecip = dailyForecast.some(d => d.condition.includes('Heavy') || d.condition === 'Hail' || d.condition === 'Thunderstorms');
     if (hasSeverePrecip && !activeWarnings.some(w => w.text.includes('SEVERE'))) {
          activeWarnings.push({ day: 0, text: 'SEVERE WEATHER: Risk of heavy precipitation/storms today.' });
     }
@@ -167,6 +171,7 @@ function runSimulation() {
     
     document.getElementById('current-time').textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
+    // t is the interpolation factor (0.0 to 1.0)
     const t = (currentMinute * 60 + currentSecond) / 3600;
 
     const currentHourData = dailyForecast.find(data => data.hour === currentHour);
@@ -179,15 +184,24 @@ function runSimulation() {
         const interpolatedHumidity = lerp(currentHourData.humidity, nextHourData.humidity, t);
         const interpolatedWindSpeed = lerp(currentHourData.windSpeed, nextHourData.windSpeed, t);
         
+        // FIX: Determine which data point to use for condition/icon/direction
+        // Use nextHourData only when the time is close to the next hour (e.g., t > 0.5) 
+        // or just rely on currentHourData which represents the START of the hour.
+        // For a seamless transition, let's keep the condition of the CURRENT hour 
+        // until the *next* hour officially begins (t=0.0 on the next hour).
+        const displayData = currentHourData; 
+        
         // --- Update UI ---
         document.getElementById('current-temp').textContent = `${Math.round(interpolatedTemp)}°C`;
-        document.getElementById('current-condition').innerHTML = `${currentHourData.icon} ${currentHourData.condition}`;
+        // FIX: Use displayData which is currentHourData to keep condition constant for the hour
+        document.getElementById('current-condition').innerHTML = `${displayData.icon} ${displayData.condition}`; 
         
         document.getElementById('current-humidity').textContent = `${Math.round(interpolatedHumidity)}%`;
-        document.getElementById('current-wind').textContent = `${Math.round(interpolatedWindSpeed)} km/h ${currentHourData.windDirection}`;
+        // FIX: Use displayData which is currentHourData to keep wind direction constant for the hour
+        document.getElementById('current-wind').textContent = `${Math.round(interpolatedWindSpeed)} km/h ${displayData.windDirection}`;
         
-        updateVisuals(currentHourData.condition); 
-        renderAnimations(currentHourData.condition); // NEW: Render the animation effects
+        updateVisuals(displayData.condition); 
+        renderAnimations(displayData.condition); // NEW: Render the animation effects
         renderForecast();
 
     }
@@ -199,6 +213,7 @@ function runSimulation() {
 }
 
 // --- Display Functions ---
+// (No changes needed in display functions)
 
 function renderAnimations(condition) {
     const layer = document.getElementById('weather-animation-layer');
@@ -403,6 +418,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Check for the NEW key (V3). If it doesn't exist, generate a new forecast.
     if (storedForecast) {
+        // FIX: The generated dailyForecast might not have the frontType stored.
+        // It's safer to re-generate the frontType, or better, re-calculate it based on daily data.
+        // For simplicity, let's keep the random approach as it reflects dynamic, non-persistent state.
         dailyForecast = JSON.parse(storedForecast);
         console.log('Loaded forecast from storage.');
         
