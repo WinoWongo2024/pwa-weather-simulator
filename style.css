@@ -1,10 +1,10 @@
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #6c757d;
-    --background-color: #f8f9fa;
+    --primary-color: #4a90e2; /* Blue */
+    --secondary-color: #50e3c2; /* Teal */
+    --background-color: #f0f4f8; /* Light blue/grey */
     --card-color: #ffffff;
-    --text-color: #343a40;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --text-color: #34495e;
+    --shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -13,8 +13,9 @@ body {
     color: var(--text-color);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align to the top for a cleaner look */
     min-height: 100vh;
+    padding: 20px;
     margin: 0;
 }
 
@@ -24,8 +25,29 @@ body {
     border-radius: 15px;
     box-shadow: var(--shadow);
     text-align: center;
-    max-width: 400px;
+    max-width: 600px; /* Wider to accommodate the forecast grid */
     width: 90%;
+    position: relative;
+}
+
+/* New: Utility button style */
+.utility-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 5px 10px;
+    font-size: 0.8em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.utility-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--card-color);
 }
 
 h1 {
@@ -34,7 +56,7 @@ h1 {
 }
 
 .time-display {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 600;
     margin-bottom: 20px;
     color: var(--secondary-color);
@@ -51,7 +73,8 @@ h1 {
     margin-bottom: 30px;
 }
 
-button {
+/* Existing button style */
+.controls button {
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -62,16 +85,49 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
+.controls button:hover {
     background-color: #0056b3;
 }
 
-/* For debugging the forecast data */
+
+/* --- 24-Hour Forecast Grid Styling --- */
 .forecast-data {
-    margin-top: 20px;
-    padding: 15px;
-    background: #e9ecef;
-    border-radius: 8px;
+    margin-top: 30px;
     text-align: left;
-    font-size: 0.8em;
+}
+
+.hourly-forecast-grid {
+    display: flex;
+    overflow-x: auto; /* Allows horizontal scrolling for 24 items */
+    padding: 10px 0;
+    border-radius: 8px;
+    background: #e9ecef;
+}
+
+.forecast-item {
+    flex: 0 0 70px; /* Fixed width for each item */
+    padding: 10px 5px;
+    text-align: center;
+    border-right: 1px solid #dcdcdc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.forecast-item:last-child {
+    border-right: none;
+}
+
+.forecast-item:hover {
+    background-color: #cce0ff; /* Highlight on hover */
+}
+
+.forecast-item .icon {
+    display: block;
+    font-size: 2em;
+    margin: 5px 0;
+}
+
+.forecast-item .temp {
+    font-weight: bold;
+    color: var(--text-color);
 }
