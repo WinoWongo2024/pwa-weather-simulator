@@ -11,6 +11,7 @@
         // PWA service worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // Registering with the scope / to cover the whole app
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => console.log('SW registered: ', registration))
                     .catch(registrationError => console.log('SW registration failed: ', registrationError));
@@ -20,10 +21,14 @@
 </head>
 <body>
     <div class="weather-app">
+        <button id="refresh-cache-btn" class="utility-btn">🔄 Clear Cache & Reload</button>
+
         <h1>Simulated Weather</h1>
+        
         <div class="time-display">
-            Current Simulated Time: <span id="current-time">00:00:00</span>
+            Current **Real** Time: <span id="current-time">00:00:00</span>
         </div>
+        
         <div class="weather-display">
             <h2 id="current-temp">--°C</h2>
             <p id="current-condition">Loading...</p>
@@ -35,7 +40,8 @@
 
         <div class="forecast-data">
             <h3>24-Hour Forecast</h3>
-            <pre id="forecast-output"></pre>
+            <div id="hourly-forecast-container" class="hourly-forecast-grid">
+                </div>
         </div>
     </div>
 </body>
