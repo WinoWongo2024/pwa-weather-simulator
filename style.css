@@ -1,196 +1,77 @@
-/* General Styling */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --card-color: #ffffff;
+    --text-color: #343a40;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* Use a dynamic background for the animation effect */
-    background: linear-gradient(135deg, #1f2a40, #0d1526); 
-    color: #f0f4f8; 
-    margin: 0;
-    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
+    margin: 0;
 }
 
-/* Background Animation: Creates subtle, slow movement for realism */
-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 300%;
-    height: 300%;
-    background: linear-gradient(45deg, #1f2a40 0%, #0d1526 25%, #1f2a40 50%, #0d1526 75%, #1f2a40 100%);
-    background-size: 200% 200%;
-    animation: flow 60s ease infinite; /* Slow, gentle animation */
-    z-index: -1;
-    opacity: 0.8;
-}
-
-@keyframes flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-header {
-    padding: 25px 20px;
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.3); /* Slightly darker header */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative; /* Above background animation */
-}
-
-.container {
-    padding: 20px;
-    max-width: 900px;
-    margin: 0 auto;
-    position: relative;
-}
-
-/* Glassmorphism Weather Card Styling */
-.weather-card {
-    background: rgba(255, 255, 255, 0.1); 
-    border-radius: 20px; /* Slightly rounder for modern look */
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Deeper shadow */
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-bottom: 30px;
+.weather-app {
+    background: var(--card-color);
     padding: 30px;
-    transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
 }
 
-.weather-card:hover {
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
-}
-
-h2 {
-    color: #8be9fd; 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding-bottom: 12px;
-    margin-top: 0;
-    font-weight: 400;
-    font-size: 1.6em;
-}
-
-/* Current Weather Styles */
-#current-location {
-    font-size: 1.8em;
-    font-weight: 500;
+h1 {
+    color: var(--primary-color);
     margin-bottom: 5px;
 }
 
-#current-temp {
-    font-size: 5.5em;
-    font-weight: 300;
-    margin: 10px 0 5px;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
-    line-height: 1;
-}
-
-#current-condition {
-    font-size: 1.5em;
-    color: #bd93f9; 
-    display: flex;
-    align-items: center;
-}
-
-#current-condition .icon {
-    font-size: 1.5em;
-    margin-right: 10px;
-}
-
-#current-time {
-    font-size: 1.1em;
-    color: rgba(255, 255, 255, 0.8);
-    margin-top: 15px;
-    font-weight: 300;
-    /* Ensure only time is redrawn on refresh */
-    will-change: content; 
-}
-
-/* Forecast List Styles */
-.forecast-list {
-    display: flex;
-    gap: 15px;
-    padding-bottom: 10px;
-    overflow-x: auto;
-    white-space: nowrap;
-    margin: 15px 0;
-}
-
-.forecast-item {
-    min-width: 110px;
-    flex-shrink: 0; 
-    text-align: center;
-    padding: 15px 5px;
-    border-radius: 12px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-.forecast-item:hover {
-    transform: scale(1.05); /* Slight scale animation */
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.forecast-item .time, .forecast-item .day {
+.time-display {
+    font-size: 1.2em;
     font-weight: 600;
-    color: #ff79c6; 
+    margin-bottom: 20px;
+    color: var(--secondary-color);
 }
 
-.forecast-item .icon {
-    font-size: 2.2em;
-    display: block;
-    margin: 8px 0;
-    /* Subtle pulsing animation for the icon */
-    animation: pulse 4s infinite ease-in-out; 
+.weather-display h2 {
+    font-size: 4em;
+    margin: 10px 0;
+    color: var(--primary-color);
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.forecast-item .temp {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #50fa7b; 
-}
-
-/* 7-Day Specific adjustments for a clean column layout */
-#daily-list {
-    flex-direction: column;
-    gap: 8px;
-}
-#daily-list .forecast-item {
-    min-width: unset;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: left;
-    padding: 15px 25px;
-    white-space: normal;
-    background-color: rgba(0, 0, 0, 0.15); /* Slightly lighter background */
-}
-#daily-list .day {
-    flex: 1;
-    font-weight: 700;
-    color: #f8f8f2;
-}
-#daily-list .icon {
+.weather-display p {
     font-size: 1.5em;
-    margin: 0 15px;
-    animation: none; /* Disable pulsing for daily icons */
+    margin-bottom: 30px;
 }
-#daily-list .condition {
-    flex: 1;
-    text-align: right;
-    color: #bd93f9;
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
 }
-#daily-list .temp {
-    flex: 0 0 100px; /* Fixed width for temperature column */
-    text-align: right;
-    color: #ffb86c; 
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* For debugging the forecast data */
+.forecast-data {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e9ecef;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.8em;
 }
